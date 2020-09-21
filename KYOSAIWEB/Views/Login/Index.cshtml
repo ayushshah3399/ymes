@@ -1,0 +1,62 @@
+﻿@model KYOSAI_WEB.Models.S0050
+@{
+    ViewBag.Title = "ログイン";
+}
+<style>
+	.login-form {
+		width: 340px;
+    	margin: 50px auto;
+	}
+    .login-form form {
+        margin-bottom: 15px;
+        background: #f7f7f7;
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+    }
+    .login-form h2 {
+        margin-bottom: 20px;
+    }
+	.form-control,input {
+		font-weight: normal;
+		font-size: 14px;
+	}
+    .form-control, .btn {
+        margin-top:10px;
+        min-height: 38px;
+        border-radius: 2px;
+    }
+    .btn {        
+        font-size: 15px;
+        font-weight: bold;
+    }
+</style>	
+
+<div class="login-form">
+	<form  method="post">
+		<h2 class="text-center">ログイン</h2> 
+		<div class="form-group">
+            @Html.TextBoxFor(model => model.USERID, new { placeholder = "ユーザーID", @class = "form-control", @autocomplete = "off", @style = "ime-mode: disabled;" })
+            @Html.ValidationMessageFor(model => model.USERID, "", new { @class = "text-danger" })
+		</div>
+		<div class="form-group ">
+			@Html.EditorFor(model => model.PASS, new { htmlAttributes = new { placeholder = "パスワード", @class = "form-control", @autocomplete = "off" } })
+            @Html.ValidationMessageFor(model => model.PASS, "", new { @class = "text-danger" })
+		</div>
+		<div class="form-group">
+            <p id="errorLogin" style="color:red">@TempData["LoginErrMsg"]</p>
+			<button id ="btnLogin" type="submit" class="btn btn-success">ログイン</button>
+			<button id ="btnReset" type="button" class="btn btn-primary pull-right">リセット</button>
+		</div>      
+	</form>
+</div>
+
+<script type="text/javascript">
+
+    $('#btnReset').click(function (e) {
+        $('#USERID').val("");
+        $('#PASS').val("");
+    });
+
+</script>
+
+

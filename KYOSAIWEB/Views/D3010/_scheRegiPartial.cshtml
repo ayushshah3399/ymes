@@ -1,0 +1,537 @@
+﻿@model IEnumerable<KYOSAI_WEB.Models.DC0060>
+
+<style>
+
+    .container {
+        text-align: center;
+        margin-left: 85px;
+    }
+
+    .mytable {
+        width: 412px;
+        align-self: center;
+    }
+
+    table.mytable tbody,
+    table.mytable thead {
+        display: block;
+    }
+
+    table.mytable tbody {
+        height: 130px;
+        width: 412px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    table.mytable tbody > tr > td {
+        vertical-align: middle;
+        padding:4px;
+    }
+
+    table.mytable > thead > tr > th {
+        padding: 8px 4px 8px 4px;
+    }
+        
+    .colbtn {
+        width: 50px;
+    }
+
+    .DELISCHECNT_header {
+        width: 80px;
+    }
+
+    .DELISCHECNT {
+        text-align: right;
+        width: 80px;
+        vertical-align: middle;
+    }
+
+    .DELISCHEDT_header {
+        width: 120px;
+    }
+
+    .DELISCHEDT {
+        width: 120px;
+        vertical-align: middle;
+        text-align:center;
+    }
+
+    .DELISCHEQTY_header {
+        width: 135px;
+    }
+
+    .DELISCHEQTY {
+        width: 135px;
+        text-align: right;
+        vertical-align: middle;
+    }
+
+    .lbl {
+        background: transparent;
+        vertical-align: bottom;
+        text-align: left;
+        font-weight: 100;
+        word-wrap: break-word;
+    }
+
+    .css-serial {
+        counter-reset: serial-number; /* Set the serial number counter to 0 */
+    }
+
+    .css-serial td:nth-child(2):before {
+        counter-increment: serial-number; /* Increment the serial number counter */
+        content: counter(serial-number); /* Display the counter */
+    }
+
+</style>
+@using (Html.BeginForm("UpdateScheduleRegData", "D3010", FormMethod.Post))
+{
+    @Html.AntiForgeryToken();
+    <div class="modal fade" id="scheRegDialog" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content" Style="width:760px;margin-left:20px;">
+                <div class="modal-header" style="margin-bottom:10px;padding-bottom:5px;">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">
+                        分納登録
+                    </h4>
+                </div>
+                <div class="modal-body" style="padding-left:30px">
+                    <div id="headerDiv" Class="">
+                        <div class="form-horizontal" style="margin-top:0px;">
+                            <div class="form-group form-inline" style="margin-bottom:3px;">
+                                <label class="control-label col-md-1" for="supplNm" style="width:102px;padding-right:0px;padding-top:0px;">取引先コード</label>
+                                <div style="margin-left:116px">
+                                    <label class="lbl" id="SUPPCD" style="width:60px;"></label>
+                                    <label class="lbl" id="supplcdNm" style="width:500px"></label>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group" style="margin-bottom:0px;max-height:50px;height:auto;">
+                                    <div class="form-inline">
+                                        <label class="control-label col-md-1" for="orderno" style="width:130px;padding-top:0px;">注文番号</label>
+                                        <div class="col-sm-3" style="padding-left:0px;">
+                                            <label class="lbl" id="orderno" Style="width:100px;"></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-inline">
+                                        <label class="control-label col-md-2" for="sehmnm" style="padding-top:0px;margin-left:34px;">資材コード</label>
+                                        <div class="col-sm-4" style="padding-left:0px;">
+                                            <label class="lbl" id="sehmnm" style="width:250px;max-width:250px;"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group" style="margin-bottom:0px;max-height:50px;height:auto;">
+                                    <div class="form-inline">
+                                        <label class="control-label col-md-1" for="hmnm" style="width:130px;padding-top:0px;">部品名</label>
+                                        <div class="col-sm-4" style="padding-left:0px;">
+                                            <label class="lbl" id="hmnm" style="width:300px"></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-inline">
+                                        <label class="control-label col-md-1" for="makeripnm" style="padding-top:0px;width:100px;">メーカー</label>
+                                        <div class="col-sm-4" style="padding-left:0px;">
+                                            <label class="lbl" id="makeripnm" style="width:600px"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group" style="margin-bottom:0px;max-height:50px;height:auto;">
+                                    <div class="form-inline">
+                                        <label class="control-label col-md-1" for="orderqty" style="width:130px;padding-top:0px;">注文数量</label>
+                                        <div class="col-sm-2" style="padding-left:0px;padding-right:5px;width:122px">
+                                            <label class="lbl" id="orderqty" style="width:200px;text-align:right;"></label>
+                                        </div>
+                                        @*<label class="control-label col-sm-1" for="unitnm" style="width:45px;padding-top:0px;padding-left:0px;">単位</label>*@
+                                        <div class="col-sm-1" style="padding-left:0px;">
+                                            <label class="lbl" id="unitnm" style="width:65px"></label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-inline">
+                                        <label class="control-label col-md-2" for="delinm" style="margin-left:70px;padding-top:0px;width:100px;">納入場所</label>
+                                        <div class="col-sm-4" style="padding-left:0px;">
+                                            <label class="lbl" id="delinm" style="width:600px"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group" style="margin-bottom:0px;max-height:50px;height:auto;">
+                                    <div class="form-inline">
+                                        <label class="control-label col-md-1" for="orderdt" style="width:130px;padding-top:0px;">注文日</label>
+                                        <div class="col-sm-3" style="padding-left:0px;">
+                                            <label class="lbl" id="orderdt" style="width:85px"></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-inline">
+                                        <label class="control-label col-md-2" for="orderPerson" style="padding-top:0px;margin-left:35px;">発注担当者</label>
+                                        <div class="col-sm-4" style="padding-left:0px;">
+                                            <label class="lbl" id="orderPerson" style="width:500px"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group" style="margin-bottom:0px;max-height:50px;height:auto;">
+                                    <div class="form-inline">
+                                        <label class="control-label col-md-1" for="agreed" style="width:130px;padding-top:0px;">希望納期</label>
+                                        <div class="col-sm-3" style="padding-left:0px;">
+                                            <label class="lbl" id="agreed" style="width:85px"></label>
+                                        </div>
+                                    </div>
+                                    <div class="form-inline">
+                                        <label class="control-label col-md-2" for="reqdelidt" style="padding-top:0px;margin-left:35px;">希望納期</label>
+                                        <div class="col-sm-2" style="padding-left:0px;">
+                                            <label class="lbl" id="reqdelidt" style="width:85px"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group form-inline" style="margin-bottom:0px;">
+                                <label class="control-label col-md-2" for="remark" style="width:102px;padding-right:0px;padding-left:0px;height:34px;vertical-align:middle;">取引先コメント</label>
+                                <div style="margin-left:116px;">
+                                    <input class="form-control" type="text" id="remark" name="remark" maxlength="40" style="width:570px;max-width:570px;">
+                                    <div id="REMARKERR"><span data-valmsg-for='REMARK' style='color:red;text-align:center'></span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="container">
+                           <table class="table table-bordered mytable css-serial" id="scheTable" style="font-size:13px">
+                                <thead>
+                                    <tr>
+                                        <th class="colbtn"><input id="btn_scheDataAdd" type="button" value="行追加" class="btn btn-success btn-xs colbtn" /></th>
+                                        <th class="DELISCHECNT_header">
+                                            納入回数
+                                        </th>
+                                        <th class="DELISCHEDT_header">
+                                            納入予定日
+                                        </th>
+                                        <th class="DELISCHEQTY_header">
+                                            納入予定数
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @Html.Hidden("scrollTop", "0")
+                                    @Html.Hidden("scrollGridVer", "0")
+                                    @Html.Hidden("scrollGridHor", "0")
+                                    @Html.Hidden("D3010Updtdt", "0")
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="modal-footer" style="padding-left:0px;">
+                            <div class="col-sm-6 text-left" style="padding-left:0px;">
+                                <button type="submit" class="btn btn-primary" id="btnRegSchedule">更新</button>
+                            </div>
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">閉じる</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+
+    //function validateNumberInput(obj) {
+    //    var number = obj.value;
+    //    return number.search(/^[0-9]{0,8}.?[0-9]{0,3}$/) == 0 ? true : false;
+    //}
+
+    $('#btn_scheDataAdd').click(function (event) {
+
+        var table = document.getElementById("scheTable");
+        var rows = table.getElementsByTagName("tr");
+        var index = rows.length - 1;
+
+        var $table = $('#scheTable');
+        var $nrow = $table.find('tr:eq(1)').clone();
+        var $ncell0 = $nrow.find('td:eq(0)');
+        var $ncell1 = $nrow.find('td:eq(1)');
+        var $ncell2 = $nrow.find('td:eq(2)');
+        var $ncell3 = $nrow.find('td:eq(3)');
+
+        var receiveKbn = $ncell3.find('[name*="RECEIVEKBN"]');
+
+        var $select = $ncell3.find('[name*="DELISCHEQTY"]');
+
+        var rowLength = rows.length - 1;
+
+        var previousRow = $('#scheTable tr:eq(' + rowLength + ')');
+
+        var previousRowThirdCell = previousRow.find('td:eq(3)');
+
+        var previousRowOrderNo = previousRowThirdCell.find('[name*="ORDERNO"]').val();
+        var previousRowRecvKbn = previousRowThirdCell.find('[name*="RECEIVEKBN"]').val();
+        //var previousRowChargeCd = previousRowThirdCell.find('[name*="UKECHARGECD"]').val();
+        var previousRowReplyDt = previousRowThirdCell.find('[name*="REPLYDT"]').val();
+
+        var previousRowDeliScheCnt = previousRowThirdCell.find('[name*="DELISCHECNT"]');
+
+        var previousCnt = previousRowDeliScheCnt.val();
+
+        var previousCntValue = parseInt(previousCnt)
+
+        var NextRowValue = previousCntValue + 1;
+
+        var $select = $ncell1.find('[name*="DELISCHECNT"]');
+        $select.val(index);
+        $select.attr("name", "DC0060[" + index + "].DELISCHECNT");
+        $select.attr("id", "DC0060[" + index + "].DELISCHECNT");
+
+        var $select = $ncell2.find('[name*="DELISCHEDT"]');
+        $select.val('');
+        $select.attr("name", "DC0060[" + index + "].DELISCHEDT");
+        $select.attr("id", "DC0060[" + index + "].DELISCHEDT");
+        $select.focus();
+
+        var $span = $ncell2.find('div').find('span');
+        $span.text("");
+        $span.attr("data-valmsg-for", "DELISCHEDT");
+
+        var $select = $ncell3.find('[name*="DELISCHEQTY"]');
+        $select.val('');
+        $select.attr("name", "DC0060[" + index + "].DELISCHEQTY");
+        $select.attr("id", "DC0060[" + index + "].DELISCHEQTY");
+        $select.bind("keypress", this, handleKeyPress);
+        $select.bind("keyup", this, handleKeyUp);
+
+        var $span = $ncell3.find('div').find('span');
+        $span.text("");
+        $span.attr("data-valmsg-for", "DELISCHEQTY");
+
+        var $select = $ncell3.find('[name*="ORDERNO"]');
+        $select.val(previousRowOrderNo);
+        $select.attr("name", "DC0060[" + index + "].ORDERNO");
+        $select.attr("id", "DC0060[" + index + "].ORDERNO");
+
+        var $select = $ncell3.find('[name*="RECEIVEKBN"]');
+        $select.val(previousRowRecvKbn);
+        $select.attr("name", "DC0060[" + index + "].RECEIVEKBN");
+        $select.attr("id", "DC0060[" + index + "].RECEIVEKBN");
+
+        //var $select = $ncell3.find('[name*="UKECHARGECD"]');
+        //$select.val(previousRowChargeCd);
+        //$select.attr("name", "DC0060[" + index + "].UKECHARGECD");
+        //$select.attr("id", "DC0060[" + index + "].UKECHARGECD");
+
+        var $select = $ncell3.find('[name*="DELISCHECNT"]');
+        $select.val(NextRowValue);
+        $select.attr("name", "DC0060[" + index + "].DELISCHECNT");
+        $select.attr("id", "DC0060[" + index + "].DELISCHECNT");
+
+        var $select = $ncell3.find('[name*="REPLYDT"]');
+        $select.val(previousRowReplyDt);
+        $select.attr("name", "DC0060[" + index + "].REPLYDT");
+        $select.attr("id", "DC0060[" + index + "].REPLYDT");
+
+        if (receiveKbn != "1") {
+            var delschedt = $ncell2.find('[name*="DELISCHEDT"]');
+            var delscheqty = $ncell3.find('[name*="DELISCHEQTY"]');
+            var deleteBtn = $ncell0.find('[id="btn_scheDataDelete"]');
+            $(delschedt).prop('readonly', false);
+            $(delschedt).addClass("datepicker1");
+            $(delscheqty).prop('readonly', false);
+            $(deleteBtn).prop('disabled', false);
+        }
+
+        $table.append($nrow);
+        //Set Focus On New Row
+        $ncell2.find('[name*="DELISCHEDT"]').focus();
+
+    });
+
+    $("#scheTable").on('click', '#btn_scheDataDelete', function () {
+
+        var table = document.getElementById("scheTable");
+        var rows = table.getElementsByTagName("tr");
+
+        if (rows.length != 2) {
+
+            $(this).closest('tr').remove();
+
+            for (var i = 0; i < rows.length - 1; i += 1) {
+                var $ncell1 = $('#scheTable tr:eq(' + (i + 1) + ') td:eq(1)');
+                var $ncell2 = $('#scheTable tr:eq(' + (i + 1) + ') td:eq(2)');
+                var $ncell3 = $('#scheTable tr:eq(' + (i + 1) + ') td:eq(3)');
+
+                var $select = $ncell1.find('[name*="DELISCHECNT"]');
+                $select.attr("name", "DC0060[" + i + "].DELISCHECNT");
+                $select.attr("id", "DC0060[" + i + "].DELISCHECNT");
+
+                var $select = $ncell2.find('[name*="DELISCHEDT"]');
+                $select.attr("name", "DC0060[" + i + "].DELISCHEDT");
+                $select.attr("id", "DC0060[" + i + "].DELISCHEDT");
+
+                var $select = $ncell3.find('[name*="DELISCHEQTY"]');
+                $select.attr("name", "DC0060[" + i + "].DELISCHEQTY");
+                $select.attr("id", "DC0060[" + i + "].DELISCHEQTY");
+
+                var $select = $ncell3.find('[name*="ORDERNO"]');
+                $select.attr("name", "DC0060[" + i + "].ORDERNO");
+                $select.attr("id", "DC0060[" + i + "].ORDERNO");
+
+                var $select = $ncell3.find('[name*="RECEIVEKBN"]');
+                $select.attr("name", "DC0060[" + i + "].RECEIVEKBN");
+                $select.attr("id", "DC0060[" + i + "].RECEIVEKBN");
+
+                //var $select = $ncell3.find('[name*="UKECHARGECD"]');
+                //$select.attr("name", "DC0060[" + i + "].UKECHARGECD");
+                //$select.attr("id", "DC0060[" + i + "].UKECHARGECD");
+
+                var $select = $ncell3.find('[name*="DELISCHECNT"]');
+                $select.attr("name", "DC0060[" + i + "].DELISCHECNT");
+                $select.attr("id", "DC0060[" + i + "].DELISCHECNT");
+
+                var $select = $ncell3.find('[name*="REPLYDT"]');
+                $select.attr("name", "DC0060[" + i + "].REPLYDT");
+                $select.attr("id", "DC0060[" + i + "].REPLYDT");
+
+            }
+        }
+    });
+
+    function handleKeyPress(el) {
+        var textValue = el.currentTarget.value;
+        var charCode = (el.which) ? el.which : event.keyCode;
+        var number = textValue.split('.');
+        if (charCode != 46 && charCode > 31 && (charCode < 48 || charCode > 57)) {
+            return false;
+        }
+        //just one dot
+        if (number.length > 1 && charCode == 46) {
+            return false;
+        }
+
+        //Check max length
+        if (number.length > 1) {
+            var num1 = number[0];
+            var num2 = number[1];
+            if (num1.length == 8 && num2.length == 3) {
+                return false;
+            }
+
+        } else {
+            if (number[0].length == 8 && charCode != 46)
+                return false;
+        }
+
+        return true;
+    }
+
+    function handleKeyUp(el) {
+        var textValue = el.currentTarget.value;
+        if (textValue.indexOf('.') > -1) {
+            var number = textValue.split('.');
+            if (number[1].length > 3) {
+                number[1] = number[1].substr(0, 3);
+            }
+            el.currentTarget.value = number[0] + "." + number[1];
+        }
+    }
+
+    function calcDeliScheQtyTotal() {
+        var sum = 0;
+        var trs = $("#scheTable > tbody > tr");
+        trs.each(function () {
+            var qty = $(this).find('input[id$=DELISCHEQTY]').val();
+            sum += parseFloat(qty);
+        });
+        return sum;
+    }
+
+    function requiredValidation() {
+        var trs = $("#scheTable > tbody > tr");
+        var require = false;
+        var errorcount = 0;
+        trs.each(function () {
+            var deliScheDt = $(this).find('input[id$=DELISCHEDT]').val();
+            var deliScheQty = $(this).find('input[id$=DELISCHEQTY]').val();
+            //Check required input is entered
+            if (deliScheDt == "") {
+                errorcount = errorcount + 1;
+                $(this).find('span[data-valmsg-for$=DELISCHEDT]').text("必須項目");
+            } else {
+                $(this).find('span[data-valmsg-for$=DELISCHEDT]').text("");
+                //Check 納入予定日 is past date
+                var orderdt = $('#orderdt').text();
+                var deliScheDtLong = Date.parse(deliScheDt);
+                var orderDtLong = Date.parse(orderdt);
+                if (deliScheDtLong < orderDtLong) {
+                    errorcount = errorcount + 1;
+                    $(this).find('span[data-valmsg-for$=DELISCHEDT]').text("発注日より過去日付は、入力できません。");
+                } else {
+                    $(this).find('span[data-valmsg-for$=DELISCHEDT]').text("");
+                }
+            }
+            if (deliScheQty == "") {
+                errorcount = errorcount + 1;
+                $(this).find('span[data-valmsg-for$=DELISCHEQTY]').text("必須項目");
+            } else {
+                $(this).find('span[data-valmsg-for$=DELISCHEQTY]').text("");
+                //Check 発注分納情報 above zero
+                if (parseInt(deliScheQty) <= 0) {
+                    errorcount = errorcount + 1;
+                    $(this).find('span[data-valmsg-for$=DELISCHEQTY]').text("0 未満の納入数は、入力できません。");
+                } else {
+                    $(this).find('span[data-valmsg-for$=DELISCHEQTY]').text("");
+                }
+            }
+        });
+
+        //Check Remark's length
+        var remark = $("#remark").val();
+        if (getByteCount(remark) > 40) {
+            errorcount = errorcount + 1;
+            $('#REMARKERR').find('span').text("文字数がオーバーしています。");
+        }
+
+        if (errorcount > 0) {
+            require = true;
+        }
+
+        return require;
+    }
+
+    function getByteCount(str) {
+        var b = str.match(/[^\x00-\xff]/g);
+        return (str.length + (!b ? 0 : b.length));
+    }
+
+    function checkQtyExceedsThanOrder() {
+        var delscheQtyTotal = calcDeliScheQtyTotal();
+        var orderQty = $('#orderqty').text();
+        if (delscheQtyTotal > orderQty) {
+            return true;
+        }
+        return false;
+    }
+
+    $('#btnRegSchedule').click(function () {
+
+        if (requiredValidation()) {
+            return false;
+        }
+
+        if (checkQtyExceedsThanOrder()) {
+            alert("納入予定数 の 合計が 発注数を超えています");
+            return false;
+        }
+
+        var result = confirm("更新処理を行います。よろしいですか?")
+
+        if (result == false) {
+            return false
+        }
+    });
+
+</script>

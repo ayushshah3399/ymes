@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Error</title>
+</head>
+<body>
+    <hgroup>
+        <h1>Error.</h1>
+        <h2>An error occurred while processing your request.</h2>
+    </hgroup>
+    Reason: @ViewData["errMsgForErrorPage"]
+    <br/>
+    <br/>
+    <div class="row text-center">
+        <div class="col-md-12">
+            <a href="@Url.Action("Index","Login")">
+                <div class="btn btn-primary text-dark" role="button">topに戻る</div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

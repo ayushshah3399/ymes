@@ -1,0 +1,87 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - 京西電機 株式会社(Web EDI)</title>
+
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+
+    <link rel="stylesheet" type="text/css" href="~/Content/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="~/Content/bootstrap-datepicker.min.css">
+    <link rel="shortcut icon" type="image/x-icon" href="~/Content/favicon.ico"/>
+    <script type="text/javascript" src="~/Scripts/jquery-3.3.1.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/bootstrap-datepicker.js"></script>
+    <script type="text/javascript" src="~/Scripts/locales/bootstrap-datepicker.ja.min.js"></script>
+</head>
+<body>
+    <div class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+
+            <div class="navbar-collapse collapse">
+                <a class="navbar-brand" style="padding-top:0px">
+                    <img src="~/Content/logo1.png" alt="homepage" class="" />
+                </a>
+                <a class="navbar-brand" style="font-size:14px;color:black;text-align: left; padding-top: 32px; padding-bottom: 0px; padding-left: 4px; vertical-align: bottom; background-color: white;">
+                    <b>京西電機株式会社</b>
+                </a>
+                <div class="navbar-text" style="font-size:17px;line-height:1;padding-bottom:0px;margin-bottom:0px;">
+                    <b>Web EDI</b> : <span style="font-size:14px">@Session["DBName"]<span> 
+                        <br> <span style="font-size:12px;"> バージョン : @System.Configuration.ConfigurationManager.AppSettings["MyProjectVer"]</span>
+                    </div>
+                <div class="navbar-text" style="font-size: 14px;">@ViewBag.Title</div>
+                @*<ul class="nav navbar-nav">
+            <li>@Html.ActionLink("納期回答画面", "Index", "D3010")</li>
+            <li>@Html.ActionLink("About", "About", "Home")</li>
+            <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+        </ul>*@
+                @if (ViewData["ID"].ToString() != "Login")
+                {
+                    <ul class="nav navbar-nav navbar-right" style="margin-right:5px;">
+                        <li>
+                            <div class="navbar-text" style="font-size: 14px;">@ViewData["LoginUsernm"]さん</div>
+                        </li>
+                        <li>@Html.ActionLink("ログオフ", "Logout", "Login", null, htmlAttributes:new {id = "btnLogout", style = "font-size: 14px;"})</li>
+                    </ul>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="container-fluid body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            
+        </footer>    </div>
+    <script type="text/javascript">
+        var array = @Html.Raw(Json.Encode(@ViewBag.S0030List));        
+
+		$('.datepicker').datepicker({
+            language: 'ja',
+            format: 'yyyy/mm/dd',
+            autoclose: true,
+            todayHighlight: true,
+            weekStart: 1,
+            inline: true,
+            sideBySide: true,
+            beforeShowDay: function (date) {
+                month = date.getMonth() + 1;
+                calender_date = date.getFullYear() + '-' + (month < 10 ? '0' + month : '' + month) +'-'+('0'+date.getDate()).slice(-2);
+                var search_index = $.inArray(calender_date, array);               
+
+                if (search_index > -1) {
+                    return { classes: 'highlighted-cal-dates' };
+                }
+            }
+        });
+
+
+    </script>
+    @*@Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")*@
+    @RenderSection("scripts", required: false)
+</body>
+</html>

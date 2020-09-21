@@ -1,0 +1,1352 @@
+﻿@model IEnumerable<KYOSAI_WEB.Models.D3010>
+
+@{
+    ViewBag.Title = "納期回答画面";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var M1010List = ViewBag.M1010List as IEnumerable<KYOSAI_WEB.Models.M1010>;
+    var M0010List = ViewBag.M0010List as IEnumerable<KYOSAI_WEB.Models.M0010>;
+    List<KYOSAI_WEB.Models.DC0060> DC0060List = new List<KYOSAI_WEB.Models.DC0060>();
+    KYOSAI_WEB.Models.DC0060 dc0060obj = new KYOSAI_WEB.Models.DC0060();
+    DC0060List.Add(dc0060obj);
+    IEnumerable<object> DC0060ListObj = DC0060List;
+    
+    var scrollTop = ViewData["scrollTop"];
+    var scrollGridVer = ViewData["scrollGridVer"];
+    var scrollGridHor = ViewData["scrollGridHor"];
+    var pageMethod = ViewData["pageMethod"];
+    var errMsg = TempData["ErrMsg"];
+    var OrderSeachFlg = ViewData["OrderSeachFlg"];
+    var ShmnoSeachFlg = ViewData["ShmnoSeachFlg"];
+}
+
+<style>
+
+     .codeNm {
+        background: transparent;
+        border-bottom: 1px solid #000000;
+    }
+
+    .table th {
+        background-color: #F0FFF0;
+        font-weight: bold;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .colLeftAlign {
+        text-align: left;
+    }
+
+    .colRightAlign {
+        text-align: right;
+    }
+
+    .webgrid-alternating-row {
+        background-color: #EAF2D3;
+        padding: 3px 7px 2px;
+    }
+
+    .grdcol0 {
+        width: 27px;
+        max-width: 27px;
+    }
+
+    .grdcol1 {
+        width: 110px;
+        max-width: 110px;
+    }
+
+    .grdcol2 {
+        width: 160px;
+        max-width: 160px;
+        word-wrap: break-word;
+    }
+
+    .grdcol3 {
+        width: 275px;
+        max-width: 275px;
+        word-wrap: break-word;
+    }
+
+    .grdcol4 {
+        width: 90px;
+        max-width: 90px;
+        word-wrap: break-word;
+    }
+
+    .grdcol5, .grdcol6, .grdcol7 {
+        width: 90px;
+        max-width: 90px;
+    }
+
+    .grdcol8 {
+        width: 50px;
+        max-width: 50px;
+    }
+
+    .grdcol9 {
+        width: 95px;
+        max-width: 95px;
+    }
+
+    .grdcol10 {
+        width: 118px;
+        max-width: 118px;
+    }
+
+    .grdcol11 {
+        width: 95px;
+        max-width: 95px;
+        word-wrap: break-word;
+    }
+
+    .grdcol12, .grdcol13, .grdcol14, .grdcol18 {
+        width: 98px;
+        max-width: 98px;
+        text-align: center;
+    }
+
+    .grdcol15 {
+        width: 120px;
+        max-width: 120px;
+    }
+
+    .grdcol16 {
+        width: 90px;
+        max-width: 90px;
+    }
+
+    .grdcol17 {
+        width: 160px;
+        max-width: 160px;
+    }
+    
+    .grdcol19 {
+        width: 80px;
+        max-width: 80px;
+    }
+
+    .grdcol20 {
+        width: 100px;
+        max-width: 100px;
+        word-wrap: break-word;
+    }
+
+    .myHeaderDiv {
+        max-width: 1890px;
+        overflow-x: hidden;
+        overflow-y: scroll;
+        z-index: 1;
+        padding-left: 0px;
+        height: 39px;
+        max-height: 39px;
+    }
+
+    .myDiv {
+        max-width: 1890px;
+        height: auto;
+        max-height: 477px;
+        overflow-y: scroll;
+        overflow-x: scroll;
+        position: relative;
+        padding-left: 0px;
+    }
+
+    .form-group.required .control-label:before {
+        content: "*";
+        color: red;
+    }
+
+    .imedisabled {
+        ime-mode: disabled;
+    }
+
+    .sortable:hover {
+        cursor: pointer;
+    }
+
+    table.D3010DataTbl tbody > tr > td, table.M1010DataTbl tbody > tr > td, table.M0010DataTbl tbody > tr > td {
+        vertical-align: middle;
+        padding: 4px;
+    }
+
+    table.D3010HeadTbl > thead > tr > th, table.M1010HeadTbl > thead > tr > th, table.M0010HeadTbl > thead > tr > th {
+        padding: 8px 4px 8px 4px;
+    }
+  
+</style>
+
+@using (Html.BeginForm("getData", "D3010", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="col-md-12">
+
+        <p style="padding-top:15px;">
+            <button id="EnDisCondition" type="button" class="btn btn-info btn-sm">検索条件表示/非表示</button>
+            | <button type="submit" id="btnSearch" class="btn btn-primary px-4 float-right">検索</button>
+        </p>
+    </div>
+
+    <div class="col-md-12" id="conditionrow">
+        <div class="form-horizontal" style="margin-top:5px;">
+            <div class="form-group required form-inline" style="margin-bottom:5px;">
+                <label class="control-label col-md-3 required" for="supplNm" style="padding-right:0px;">取引先コード</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" name="SUPPCD" id="SUPPCD" maxlength="6" placeholder="必ず入力してください。" value="@Html.Encode(ViewData["SUPPCD"])" style="width:220px;">
+                    <button type="button" class="btn btn-primary px-4 float-right" id="btnMSuppcd" data-toggle="modal" data-target="#M1010Dialog">...</button>
+                    <label class="codeNm" id="supplcdNm"></label>
+                    <div id="ErrorSuppcd" style="color:red"></div>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:5px;">
+                <div class="form-inline">
+                    <label class="control-label col-md-3" for="ORDERNO" style="padding-right:0px;">注文番号</label>
+                    <div class="col-sm-7  form-inline">
+                        <div class="col-sm-4" style="padding-left:0px;width:auto;padding-right:5px;">
+                            <input type="text" class="form-control" id="ORDERNO" name="ORDERNO" maxlength="10" placeholder="入力してください。" value="@Html.Encode(ViewData["ORDERNO"])" style="width:220px;">
+                            <button id="lblOrdSrchFlg" onclick="searchConditionChng('orderno',$(this))" type="button" class="btn btn-info btn-sm" style="height:34px;min-width:40px;">～</button>
+                        </div>                       
+                        <div class="col-sm-6  form-inline" style="padding-left:0px;">
+                            <input type="text" class="form-control" id="ORDERNOTO" name="ORDERNOTO" maxlength="10" placeholder="入力してください。" value="@Html.Encode(ViewData["ORDERNOTO"])" style="width:220px;">
+                        </div>
+                    </div>
+                </div>                
+            </div>
+
+            <div class="form-group" style="margin-bottom:5px;">
+                <div class="form-inline">
+                    <label class="control-label col-md-3" for="SEHMNO" style="padding-left:10px;padding-right:0px;">資材コード</label>
+                    <div class="col-sm-7 form-inline">
+                        <div class="col-sm-5" style="padding-left:0px;padding-right:5px;width:auto;">
+                            <input type="text" class="form-control" id="SEHMNO" name="SEHMNO" maxlength="20" placeholder="入力してください。" value="@Html.Encode(ViewData["SEHMNO"])" style="width:220px;">
+                            <button id="btnSehmno" type="button" class="btn btn-primary px-4 float-right" data-toggle="modal" data-target="#M0010Dialog" onclick="tempTD=SEHMNO">...</button>
+                            <button id="lblShmnoSrhFlg" onclick="searchConditionChng('sehmno',$(this))" type="button" class="btn btn-info btn-sm" style="height:34px;min-width:40px;">～</button>
+                        </div>                        
+                        <div class="col-sm-6 form-inline" style="padding-left:0px;">
+                            <input type="text" class="form-control" id="SEHMNOTO" name="SEHMNOTO" maxlength="20" placeholder="入力してください。" value="@Html.Encode(ViewData["SEHMNOTO"])" style="width:220px;">
+                            <button id="btnSehmnoTO" type="button" class="btn btn-primary px-4 float-right" data-toggle="modal" data-target="#M0010Dialog" onclick="tempTD=SEHMNOTO">...</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:5px;">
+                <div class="form-inline">
+                    <label class="control-label col-md-3" for="HMNM" style="padding-right:0px;">部品名</label>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="HMNM" name="HMNM" maxlength="40" placeholder="入力してください。" value="@Html.Encode(ViewData["HMNM"])" style="width:220px;">
+                        <label style="padding-left:10px;">を含む</label>
+                    </div>
+                </div>
+                <div class="form-inline">
+                    <label class="control-label col-md-1" for="ORDERDTFR" style="padding-right:0px;">注文日</label>
+                    <div class="col-sm-5">
+                        <div class="col-sm-2" style="padding-left:0px;width:110px;">
+                            <input type="text" class="form-control datepicker imedisabled" id="ORDERDTFR" maxlength="10" onchange="checkDateRange('orderdt')" name="ORDERDTFR" placeholder="YYYY/MM/DD" style="width:110px;text-align:center;" value=@Html.Encode(ViewData["ORDERDTFR"])>
+                            <div id="ErrorOrderDt" style="color:red;width:270px;"></div>
+                        </div>
+                        <div class="col-sm-1" style="width:10px;">
+                            ～
+                        </div>
+                        <div class="col-sm-1">
+                            <input type="text" class="form-control datepicker imedisabled" id="ORDERDTTO" maxlength="10" onchange="checkDateRange('orderdt')" name="ORDERDTTO" placeholder="YYYY/MM/DD" style="width:110px;text-align:center;" value=@Html.Encode(ViewData["ORDERDTTO"])>
+                        </div>                        
+                    </div>                    
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:5px;">
+                <div class="form-inline">
+                    <label class="control-label col-md-3" for="MAKERIPNM" style="padding-right:0px;">メーカー名</label>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="MAKERIPNM" name="MAKERIPNM" maxlength="30" placeholder="入力してください。" value="@Html.Encode(ViewData["MAKERIPNM"])" style="width:220px;">
+                        <label style="padding-left:10px;">を含む</label>
+                    </div>
+                </div>
+                <div class="form-inline">
+                    <label class="control-label col-md-1" for="AGREEDFR" style="padding-right:0px;">注文納期</label>
+                    <div class="col-sm-5">
+                        <div class="col-sm-2" style="padding-left:0px;width:110px;">
+                            <input type="text" class="form-control datepicker imedisabled" id="AGREEDFR" maxlength="10" name="AGREEDFR" onchange="checkDateRange('agreed')" placeholder="YYYY/MM/DD" style="width:110px;text-align:center;" value=@Html.Encode(ViewData["AGREEDFR"])>
+                            <div id="ErrorAgreed" style="color:red;width:285px;"></div>
+                        </div>
+                        <div class="col-sm-1" style="width:10px;">
+                            ～
+                        </div>
+                        <div class="col-sm-1">
+                            <input type="text" class="form-control datepicker imedisabled" id="AGREEDTO" maxlength="10" name="AGREEDTO" onchange="checkDateRange('agreed')" placeholder="YYYY/MM/DD" style="width:110px;text-align:center;" value=@Html.Encode(ViewData["AGREEDTO"])>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:5px;">
+                <div class="form-inline">
+                    <label class="control-label col-md-3" for="DELINM" style="padding-right:0px;">納入場所</label>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="DELINM" name="DELINM" maxlength="40" placeholder="入力してください。" value="@Html.Encode(ViewData["DELINM"])" style="width:220px;">
+                        <label style="padding-left:10px;">を含む</label>
+                    </div>
+                </div>
+                <div class="form-inline">
+                    <label class="control-label col-md-1" for="REQDELIDTFR" style="padding-right:0px;">希望納期</label>
+                    <div class="col-sm-5">
+                        <div class="col-sm-2" style="padding-left:0px;width:110px;">
+                            <input type="text" class="form-control datepicker imedisabled" id="REQDELIDTFR" maxlength="10" name="REQDELIDTFR" onchange="checkDateRange('reqdeldt')" placeholder="YYYY/MM/DD" style="width:110px;text-align:center;" value=@Html.Encode(ViewData["REQDELIDTFR"])>
+                            <div id="Errorreqdel" style="color:red;width:285px;"></div>
+                        </div>
+                        <div class="col-sm-1" style="width:10px;">
+                            ～
+                        </div>
+                        <div class="col-sm-1">
+                            <input type="text" class="form-control datepicker imedisabled" id="REQDELIDTTO" maxlength="10" name="REQDELIDTTO" onchange="checkDateRange('reqdeldt')" placeholder="YYYY/MM/DD" style="width:110px;text-align:center;" value=@Html.Encode(ViewData["REQDELIDTTO"])>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="padding-bottom:0px;margin-bottom:0px;">
+                <div class="form-inline" style="padding-bottom:0px;margin-bottom:0px;">
+                    <label class="control-label col-md-3" for="CHARGENM" style="padding-right:0px;">発注担当者</label>
+                    <div class="col-sm-3">
+                        <input type="text" class="form-control" id="CHARGENM" name="CHARGENM" maxlength="50" placeholder="入力してください。" value="@Html.Encode(ViewData["CHARGENM"])" style="width:220px;">
+                        <label style="padding-left:10px;">を含む</label>
+                    </div>
+                </div>
+                <div class="form-inline" style="padding-bottom:0px;margin-bottom:0px;">
+                    <label class="control-label col-md-1" for="STATE" style="padding-right:0px;">出荷状態</label>
+                    <div class="col-sm-5">
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="flgSTATEall" name="flgSTATEall">全て
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="STATE" name="STATE2" @Html.Encode(ViewData["STATE2"]) value="2">未完
+                        </label>
+                        <label class="checkbox-inline">
+                            <input type="checkbox" id="STATE" name="STATE1" @Html.Encode(ViewData["STATE1"]) value="1">未実績
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom:5px;">
+                <label class="control-label col-md-3 col-lg-push-4" for="chk1" style="padding-right:0px;">回答済区分</label>
+                <div class="col-md-4 col-md-push-4">
+
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="flgREPLYKBNall" name="flgREPLYKBNall">全て
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="REPLYKBN" name="REPLYKBN1" @Html.Encode(ViewData["REPLYKBN1"]) value="1">未回答
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="REPLYKBN" name="REPLYKBN2" @Html.Encode(ViewData["REPLYKBN2"]) value="2">回答済
+                    </label>
+                    <label class="checkbox-inline">
+                        <input type="checkbox" id="REPLYKBN" name="REPLYKBN3" @Html.Encode(ViewData["REPLYKBN3"]) value="3">一部回答済
+                    </label>
+                </div>
+            </div>
+
+            @Html.Hidden("OrderSeachFlg", "0")
+            @Html.Hidden("ShmnoSeachFlg", "0")
+        </div>
+    </div>
+}
+
+<div class="col-md-12">
+    @using (Html.BeginForm("UpdateData", "D3010", FormMethod.Post))
+    {        
+        @Html.AntiForgeryToken();
+        @Html.Hidden("scrollTop", "0")
+        @Html.Hidden("scrollGridVer", "0")
+        @Html.Hidden("scrollGridHor", "0")
+
+        <div Class="row" style="max-width: 1780px;border:1px solid #ecf0f1;margin-left:1px;margin-right:5px;">
+            <div id="headerDiv" class="myHeaderDiv col-md-12">
+                <table id="tbl-header" class="table table-bordered table-hover D3010HeadTbl" style="margin-bottom:0px;table-layout:fixed;">
+                    <thead>
+                        <tr>
+                            <th class="grdcol0 "></th>
+                            <th class="grdcol1 sortable" onclick="sortTable(1,'')" >注文番号</th>
+                            <th class="grdcol2 sortable" onclick="sortTable(2,'')" >資材コード</th>
+                            <th class="grdcol3 sortable" onclick="sortTable(3,'')">部品名（資材名称）</th>
+                            <th class="grdcol4 sortable" onclick="sortTable(4,'')">メーカー名</th>
+                            <th class="grdcol5 sortable" onclick="sortTable(5,'decimal')">注文数</th>
+                            <th class="grdcol6 sortable" onclick="sortTable(6,'decimal')">納入数</th>
+                            <th class="grdcol7 sortable" onclick="sortTable(7,'decimal')">注残数</th>
+                            <th class="grdcol8 sortable" onclick="sortTable(8,'')">単位</th>
+                            <th class="grdcol9 sortable" onclick="sortTable(9,'decimal')">注文単価</th>
+                            <th class="grdcol10 sortable" onclick="sortTable(10,'decimal')">注文金額</th>
+                            <th class="grdcol11 sortable" onclick="sortTable(11,'')">納入場所</th>
+                            <th class="grdcol12 sortable" onclick="sortTable(12,'')">注文日</th>
+                            <th class="grdcol13 sortable" onclick="sortTable(13,'')">注文納期</th>
+                            <th class="grdcol14 sortable" onclick="sortTable(14,'')">希望納期</th>
+                            <th class="grdcol15">回答納期</th>
+                            <th class="grdcol16">分納</th>
+                            <th class="grdcol17">取引先コメント</th>
+                            <th class="grdcol18 sortable" onclick="sortTable(18,'')">回答日</th>
+                            <th class="grdcol19 sortable" onclick="sortTable(19,'number')">回答回数</th>
+                            <th class="grdcol20 sortable" onclick="sortTable(20,'')">発注担当者</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+            <div id="dataDiv" class="myDiv col-sm-12">
+                <table id="tblSearchResult" class="table table-bordered table-hover D3010DataTbl" style="margin-bottom:0px;table-layout:fixed;">
+                    <tbody>
+                        @{
+                            var d3010List = Model.ToList();
+                            var d3010Index = "D3010[";
+                            Boolean paymentFlg;
+                            for (var i = 0; i < d3010List.Count(); i++)
+                            {
+                                paymentFlg  = false;
+                                d3010Index = "D3010[";
+                                d3010Index = String.Format("{0}{1}{2}", d3010Index, i, "]");
+                                if (d3010List[i].PAYMENTKBN == "1")
+                                {
+                                    paymentFlg = true;
+                                }
+                                <tr>
+                                    <td id="RNO" class="RNo colRightAlign grdcol0"> @Convert.ToInt32(i + 1)</td>
+                                    <td id="ORDERNO" class="ORDERNO colLeftAlign grdcol1">
+                                        @d3010List[i].ORDERNO
+                                        @Html.Hidden(String.Format("{0}{1}", d3010Index, ".ORDERNO"), d3010List[i].ORDERNO)
+                                        @Html.Hidden(String.Format("{0}{1}", d3010Index, ".UPDTDT"), d3010List[i].UPDTDT)                                        
+                                        @Html.Hidden("SUPPCD", d3010List[i].SUPPCD)
+                                        @Html.Hidden("SUPPNM", d3010List[i].SUPPNM)
+                                    </td>
+                                    <td id="SEHMNO" class="colLeftAlign grdcol2">@d3010List[i].M0010.SEHMNO</td>
+                                    <td id="HMNM" class="colLeftAlign grdcol3">@d3010List[i].M0010.HMNM</td>
+                                    <td id="MAKERIPNM" class="colLeftAlign grdcol4">@((d3010List[i].M0010 == null || d3010List[i].M0010.MC0030 == null || d3010List[i].M0010.MC0030.MAKERIPNM == null) ? "" : d3010List[i].M0010.MC0030.MAKERIPNM)</td>
+                                    <td id="ORDERQTY" class="ORDERQTY colRightAlign grdcol5">@(d3010List[i].ORDERQTY == 0 ? "0.00" : d3010List[i].ORDERQTY.ToString("#,###.00"))</td>
+                                    <td id="DELIQTY" class="colRightAlign grdcol6">@(d3010List[i].DELIQTY == 0 ? "0.00" : d3010List[i].DELIQTY.ToString("#,###.00"))</td>
+                                    <td id="BKLOGQTY" class="colRightAlign grdcol7">@(d3010List[i].BKLOGQTY == 0 ? "0.00" : d3010List[i].BKLOGQTY.ToString("#,###.00"))</td>
+                                    <td id="UNITNM" class="colLeftAlign grdcol8">@d3010List[i].UNITNM</td>
+                                    <td id="PRICE" class="PRICE colRightAlign grdcol9">@(d3010List[i].PRICE == 0 ? "0.00" : d3010List[i].PRICE.ToString("#,###.00"))</td>
+                                    <td id="AMOUNT" class="AMOUNT colRightAlign grdcol10">@(d3010List[i].AMOUNT == 0 ? "0" : d3010List[i].AMOUNT.ToString("#,###"))</td>
+                                    <td id="DELINM" class="colLeftAlign grdcol11">@d3010List[i].M1050.DELINM</td>
+                                    <td id="ORDERDT" class="grdcol12">@((d3010List[i].ORDERDT is null) ? null : String.Format("{0:yyyy/MM/dd}", d3010List[i].ORDERDT))</td>
+                                    <td id="AGREED" class="grdcol13">@(String.Format("{0:yyyy/MM/dd}", d3010List[i].AGREED))</td>
+                                    <td id="REQDELIDT" class="REQDELIDT grdcol14">@((d3010List[i].REQDELIDT is null) ? null : String.Format("{0:yyyy/MM/dd}", d3010List[i].REQDELIDT))</td>
+                                    <td id="REPLY" class="grdcol15">
+                                        @if (paymentFlg == true)
+                                        {
+                                            <input class="form-control imedisabled" id="@String.Format("{0}{1}", d3010Index, ".REPLY")" name="@String.Format("{0}{1}", d3010Index, ".REPLY")" type="text" readonly="@paymentFlg" value="@((d3010List[i].REPLY == null) ? null : String.Format("{0:yyyy/MM/dd}", d3010List[i].REPLY))" placeholder="YYYY/MM/DD" style="width:100%;text-align:center;padding:4px;">
+                                        }
+                                        else
+                                        {
+                                            <input class="form-control datepicker imedisabled" id="@String.Format("{0}{1}", d3010Index, ".REPLY")" name="@String.Format("{0}{1}", d3010Index, ".REPLY")" type="text" readonly="@paymentFlg" value="@((d3010List[i].REPLY == null) ? null : String.Format("{0:yyyy/MM/dd}", d3010List[i].REPLY))" placeholder="YYYY/MM/DD" style="width:100%;text-align:center;padding:4px;">
+                                        }
+                                    </td>
+                                    <td id="PAYMTFLG" class="grdcol16">
+                                        @if (paymentFlg == true)
+                                        {
+                                            <input type="checkbox" checked="@paymentFlg" readonly="@paymentFlg" onclick="return false;" style="vertical-align:middle;margin:0px;"><button type="button" value="" style="margin-left:7px" data-toggle="modal" data-kbn="@d3010List[i].ORDERNO" data-target="#scheRegDialog" onclick="tempTD=$(this)">詳細</button>
+                                        }
+                                        else
+                                        {
+                                            <input type="checkbox" checked="@paymentFlg" readonly="@paymentFlg" onclick="return true;" style="vertical-align:middle;margin:0px;"><button type="button" value="" style="margin-left:7px" data-toggle="modal" data-kbn="@d3010List[i].ORDERNO" data-target="#scheRegDialog" onclick="tempTD=$(this)">詳細</button>
+                                        }
+                                    </td>
+                                    <td id="BCCMT" class="BCCMT colLeftAlign grdcol17">
+                                        <input class="form-control" type="text" id="@String.Format("{0}{1}", d3010Index, ".BCCMT")" name="@String.Format("{0}{1}", d3010Index, ".BCCMT")" value="@d3010List[i].BCCMT" style="width:100%;" readonly="@paymentFlg">
+                                        @Html.ValidationMessage(String.Format("{0}{1}", d3010Index, ".BCCMT"), new { @style = "color:red" })
+                                    </td>
+                                    <td id="ANSDT" class="colRightAlign grdcol18">@(String.Format("{0:yyyy/MM/dd}", d3010List[i].ANSDT)) </td>
+                                    <td id="REPLYCNT" class="colRightAlign grdcol19">@d3010List[i].REPLYCNT</td>
+                                    <td id="CHARGENM" class="colLeftAlign grdcol20">@d3010List[i].CHARGENM</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="noDataDiv" style="text-align: center;margin-top:40px;">
+                <label for="noData" style="vertical-align:middle">一致するデータは見つかりませんでした。</label>
+            </div>
+        </div>
+
+        <div class="row" style="margin-top:10px;margin-left:1px">
+            <button type="submit" class="btn btn-primary" id="btnsave">更新</button>
+            @*<button type="button" class="btn btn-primary" id="btnDetail">分納登録</button>*@
+        </div>
+    }
+</div>
+
+<div class="modal fade" id="M1010Dialog" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" Style="width:760px;">
+            <div class="modal-header" >
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">取引先選択</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-inline">
+                    <label class="control-label col-md-2" for="FILTBCCD" style="vertical-align:middle;width:88px;height:34px;padding-top:7px;padding-left:0px;padding-right:0px;">取引先コード</label>
+                    <div class="col-sm-4" style="padding-left:0px;">
+                        <input type="text" class="form-control" id="FILTBCCD" name="FILTBCCD" maxlength="6" value="" style="width:150px;">
+                        <label style="padding-left:10px;">を含む</label>
+                    </div>
+                </div>
+                <div class="form-inline">
+                    <label class="control-label col-md-1" for="FILTBCNM" style="vertical-align:middle;width:83px;height:34px;padding-top:7px;padding-left:0px;padding-right:0px;">取引先名称</label>
+                    <div class="col-sm-5" style="padding-left:0px;">
+                        <input type="text" class="form-control" id="FILTBCNM" name="FILTBCNM" maxlength="50" value="">
+                        <label style="padding-left:10px;">を含む</label>
+                    </div>
+                </div>
+               
+                <div class="row" style="margin-top:15px">
+                    <div class="form-horizontal" style="margin-top:40px;margin-left:15px;">
+                        <button type="button" id="btnFilterM1010" class="btn btn-primary px-4 float-right" onclick="filterM1010()">検索</button>
+                    </div>
+                </div>
+
+                <hr />
+                <div id="headerM1010Div" Class="myHeaderDiv" Style="padding:0px;">
+                    <table id="tbl-header" class="table table-bordered table-hover M1010HeadTbl" style="margin-bottom:0px;table-layout:fixed;">
+                        <thead>
+                            <tr>
+                                <th style="width:140px;"> 取引先コード</th>
+                                <th> 取引先名称</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div id="dataM1010Div" class="myDiv" style="max-height:250px;overflow-y:scroll;padding:0px;">
+                    <table id="tblM1010Result" class="table table-bordered table-hover M1010DataTbl" style="margin-bottom:0px;table-layout:fixed;max-height:200px;">
+                        <tbody id="myTableBody">
+                            @foreach (var item in M1010List)
+                            {
+                                <tr>
+                                    <td style="word-wrap: break-word;width:140px;">
+                                        @Html.DisplayFor(modelItem => item.BCCD)
+                                    </td>
+                                    <td style="word-wrap: break-word;">
+                                        @Html.DisplayFor(modelItem => item.BCNM)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-top:10px;">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="M0010Dialog" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" Style="width:760px;">
+            <div class="modal-header" style="margin-bottom:0px;">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">資材選択</h4>
+            </div>
+            <div class="modal-body" style="padding-bottom:10px;">
+                <div class="form-inline">
+                    <label class="control-label col-md-2" for="FILTHMNO" style="vertical-align:middle;width:70px;height:34px;padding-top:6px;padding-left:0px;padding-right:0px;">資材コード</label>
+                    <div class="col-sm-4" style="padding-left:0px;padding-right:0px;">
+                        <input type="text" class="form-control" id="FILTHMNO" name="FILTHMNO" maxlength="20" value="" style="width:190px;">
+                        <label style="padding-left:10px;">を含む</label>
+                    </div>
+                </div>
+                <div class="form-inline">
+                    <label class="control-label col-md-2" for="FILTHMNM" style="vertical-align:middle;width:126px;height:34px;padding-top:6px;padding-left:0px;padding-right:0px;margin-left:41px">部品名（資材名用）</label>
+                    <div class="col-sm-4" style="padding-left:0px;padding-right:0px;">
+                        <input type="text" class="form-control" id="FILTHMNM" name="FILTHMNM" maxlength="20" value="" style="width:190px;">
+                        <label style="padding-left:10px;">を含む</label>
+                    </div>
+                </div>
+
+                <div class="form-inline" style="margin-top:40px;">
+                    <label class="control-label col-md-2" for="MAKERIPNM" style="vertical-align:middle;width:70px;height:34px;padding-top:6px;padding-left:0px;padding-right:0px;">メーカー名</label>
+                    <div class="col-sm-5" style="padding-left:0px;padding-right:0px;">
+                        <input type="text" class="form-control" id="FILTMAKERIPNM" name="FILTMAKERIPNM" maxlength="20" value="" style="width:190px;">
+                        <label style="padding-left:10px;">を含む</label>
+                    </div>
+                </div>
+                
+                <div class="row" style="margin-top:50px">
+                    <div class="form-horizontal" style="margin-top:40px;margin-left:15px;">
+                        <button type="button" id="btnFilter" class="btn btn-primary px-4 float-right" onclick="filterM0010()">検索</button>
+                    </div>
+                </div>
+
+                <hr />
+
+                <div id="headerM0010Div" Class="myHeaderDiv" Style="padding:0px;">
+                    <table id="tbl-header" class="table table-bordered table-hover M0010HeadTbl" style="margin-bottom:0px;table-layout:fixed;">
+                        <thead>
+                            <tr>
+                                <th style="width:150px;">
+                                    資材コード
+                                </th>
+                                <th>
+                                    部品名（資材名用）
+                                </th>
+                                <th>
+                                    メーカー名
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+
+                <div id="dataM0010Div" class="myDiv" style="max-height:250px;overflow-y:scroll;padding:0px;">
+                    <table id="tblM0010" class="table table-bordered table-hover M0010DataTbl" style="margin-bottom:0px;table-layout:fixed;max-height:200px;">
+                        <tbody id="myTableBody">
+                            @foreach (var item in M0010List)
+                            {
+                                <tr>
+                                    <td style="word-wrap: break-word;width:150px;">
+                                        @Html.DisplayFor(modelItem => item.HMNO)
+                                    </td>
+                                    <td style="word-wrap: break-word;">
+                                        @Html.DisplayFor(modelItem => item.HMNM)
+                                    </td>
+                                    <td style="word-wrap: break-word;">
+                                        @Html.DisplayFor(modelItem => item.MC0030.MAKERIPNM)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" style="margin-top:10px;">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_scheRegiPartial", DC0060ListObj)
+
+<script type="text/javascript">
+    var tempTD;
+    var array = @Html.Raw(Json.Encode(@ViewBag.S0030List)); 
+
+    $(document).ready(function () {
+
+        if ('@errMsg' != "") {
+            alert('@errMsg');
+        }
+
+        if ('@OrderSeachFlg' == "1") {
+            $('#lblOrdSrchFlg').trigger('click');
+        }
+
+        if ('@ShmnoSeachFlg' == "1") {
+            $('#lblShmnoSrhFlg').trigger('click');
+        }
+
+         $("#noDataDiv").hide();
+         if ($("#SUPPCD").val() != "") {
+             getSuppNm($("#SUPPCD").val());
+         }
+
+         if ('@Session["UserSuppcd"]' != "") {
+             $("#SUPPCD").prop('disabled', true);
+             $("#btnMSuppcd").prop('disabled', true);
+         }
+
+         if ('@pageMethod' != "index" || '@Session["UserSuppcd"]' != "") {
+             $("#conditionrow").hide();
+         }
+
+         var table = document.getElementById("tblSearchResult");
+         var rows = table.getElementsByTagName("tr");
+         if (rows.length == 0) {
+             $("#noDataDiv").show();
+             $("#dataDiv").hide();
+             $("#btnsave").prop('disabled', true);
+             $("#btnDetail").prop('disabled', true);
+         }
+
+        document.documentElement.scrollTop = '@scrollTop';
+        document.getElementById("dataDiv").scrollTop = '@scrollGridVer';
+        document.getElementById("dataDiv").scrollLeft = '@scrollGridHor';
+        document.getElementById("headerDiv").scrollLeft = '@scrollGridHor';
+        var StateunChkCnt = $("input[type='checkbox']:input[name^='STATE']:not(:checked)");
+        if (StateunChkCnt.length == 0)
+            $("#flgSTATEall").prop("checked", true);
+
+        var ReplyKbnunChkCnt = $("input[type='checkbox']:input[name^='REPLYKBN']:not(:checked)");
+        if (ReplyKbnunChkCnt.length == 0)
+            $("#flgREPLYKBNall").prop("checked", true);
+    });
+     $('#tblM1010Result >tbody > tr').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        row.find('td:eq(1)');
+        $('#SUPPCD').val(row.find('td:first').text().trim())
+         $('#supplcdNm').html(row.find('td:eq(1)').text().trim())
+         $('#ErrorSuppcd').html('');
+        $('#M1010Dialog').modal('toggle');
+    });
+
+    $('#tblM0010 >tbody > tr').dblclick(function () {
+        var $this = $(this);
+        var row = $this.closest("tr");
+        row.find('td:eq(1)');
+        tempTD.value = row.find('td:first').text().trim();
+        //$('#SEHMNO').val(row.find('td:first').text().trim())
+        $('#M0010Dialog').modal('toggle');
+    });
+    $('#EnDisCondition').on('click', function (e) {
+        if ($("#conditionrow").is(':hidden')) {
+            $("#conditionrow").show();
+        }
+        else {
+            $("#conditionrow").hide();
+        }
+    });
+
+     $('.checkbox-inline').on('click', function (e) {
+        //var codes = [];
+        //$.each($("input[name^='STATE']:checked"), function () {
+        //    codes.push($(this).val());
+        //});
+
+        //document.getElementById("STATE").value = codes;
+        //alert("My favourite sports are: " + favorite.join(", "));
+        var control = this.querySelector("input[type='checkbox']");
+         if (control.id == 'STATE') {
+             if (control.checked) {
+                 var unChkCnt = $("input[type='checkbox']:input[name^='STATE']:not(:checked)");
+                 if (unChkCnt.length == 0)
+                     $("#flgSTATEall").prop("checked", true);
+             } else {
+                 $("#flgSTATEall").prop("checked", false);
+             }
+         } else if (control.id == 'REPLYKBN') {
+             if (control.checked) {
+                 var unChkCnt = $("input[type='checkbox']:input[name^='REPLYKBN']:not(:checked)");
+                 if (unChkCnt.length == 0)
+                     $("#flgREPLYKBNall").prop("checked", true);
+             } else {
+                 $("#flgREPLYKBNall").prop("checked", false);
+             }
+         }
+
+
+    });
+
+    $('#flgSTATEall').on('click', function (e) {
+        if (!this.checked) {
+            $.each($("input[name^='STATE']:checked"), function () {
+                $(this).prop("checked", false);
+            });
+        } else {
+            $.each($("input[name^='STATE']:not(:checked)"), function () {
+                $(this).prop("checked", true);
+            });
+        }
+    });
+
+    $('#flgREPLYKBNall').on('click', function (e) {
+        if (!this.checked) {
+            $.each($("input[name^='REPLYKBN']:checked"), function () {
+                $(this).prop("checked", false);
+            });
+        } else {
+            $.each($("input[name^='REPLYKBN']:not(:checked)"), function () {
+                $(this).prop("checked", true);
+            });
+        }
+    });
+
+    //Save 画面：明細部
+    $('#btnsave').click(function (e) {
+        var elmnt = document.getElementById("dataDiv");
+        var scrollHor = parseInt(elmnt.scrollLeft);
+        var scrollVer = parseInt(elmnt.scrollTop);
+        $('input[name="scrollTop"]').val(document.documentElement.scrollTop);
+        $('input[name="scrollGridVer"]').val(scrollVer);
+        $('input[name="scrollGridHor"]').val(scrollHor);
+
+        var isErr = validateD3010Data();
+        return !isErr;
+    });
+
+    //Scroll
+    $("#dataDiv").scroll(function () {
+        $("#headerDiv").scrollLeft($("#dataDiv").scrollLeft());
+     });
+
+    //Method for get suppNm and set
+    function getSuppNm(suppcd) {
+        var suppNm = "";
+
+        if (suppcd == "") {
+            $("#ErrorSuppcd").text("必須項目");
+            $('#supplcdNm').html('');
+        }
+        else {
+            var _suppcd = suppcd;
+            var url = '@Url.Action("getSuppcdNm")';
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data: { suppcd: _suppcd }
+            }).done(function (data) {
+                if (data != "") {
+                     if (data == "Invalid") {
+                        $("#ErrorSuppcd").text("");
+                        $('#supplcdNm').html('');
+                     }
+                     else if (data == "not exist") {
+                         $("#ErrorSuppcd").text("取引先コード存在しない。 ");
+                         $('#supplcdNm').html('');
+                     } else {
+                         $('#supplcdNm').html(data);
+                         $("#ErrorSuppcd").text("");
+                     }
+                }
+            }).fail(function () {
+                alert("データの読み込み中にエラーが発生しました。");
+            });
+        }
+
+        return suppNm;
+     }
+
+     //Set suppNm when blur
+     $("#SUPPCD").blur(function () {
+         getSuppNm($(this)[0].value);
+     });
+
+    $('#btnSearch').on('click', function (e) {
+        $("#SUPPCD").prop('disabled', false);
+        var rtnFlag = true;
+
+        if ($("#SUPPCD")[0].value == "") {
+            $("#ErrorSuppcd").text("必須項目");
+            rtnFlag = false;
+        } else {
+            $("#ErrorSuppcd").text("");
+        }
+
+        var flag = checkDateRange('orderdt');
+
+        if (flag == true) {
+            flag = checkDateRange('agreed');
+        } else {
+            checkDateRange('agreed');
+            rtnFlag = false;
+        }
+
+        if (flag == true) {
+            flag = checkDateRange('reqdeldt');            
+        } else {
+            checkDateRange('reqdeldt');
+            rtnFlag = false;
+        }
+
+        if (flag == false) {
+            rtnFlag = false;
+        }
+         
+        return rtnFlag;
+     });
+
+    var selectedRow;
+
+    $('#scheRegDialog').on('shown.bs.modal', function (e) {
+        var orderObj = $(selectedRow).find('#ORDERNO');
+        var suppcd = orderObj.find("input[type='hidden'][id='SUPPCD']").val();
+        var suppnm = orderObj.find("input[type='hidden'][id='SUPPNM']").val();
+        var orderno = $(selectedRow).find('#ORDERNO').text().trim();
+        var sehmno = $(selectedRow).find('#SEHMNO').text().trim();
+        var hmnm = $(selectedRow).find('#HMNM').text().trim();
+        var maker = $(selectedRow).find('#MAKERIPNM').text().trim();
+        var orderqty = $(selectedRow).find('#ORDERQTY').text().trim();
+        var unit = $(selectedRow).find('#UNITNM').text().trim();
+        var delinm = $(selectedRow).find('#DELINM').text().trim();
+        var orderdt = $(selectedRow).find('#ORDERDT').text().trim();
+        var agreed = $(selectedRow).find('#AGREED').text().trim();
+        var reqdelidt = $(selectedRow).find('#REQDELIDT').text().trim();
+        var remark = $(selectedRow).find('#BCCMT').find("input").val();
+        var updtdt = orderObj.find("input[type='hidden'][id$='UPDTDT']").val();
+
+        var orderperson = $(selectedRow).find('#CHARGENM').text().trim();
+
+        var modalObj = $(this);
+        modalObj.find('#SUPPCD').text(suppcd);
+        modalObj.find('#supplcdNm').text(suppnm);
+        modalObj.find('#orderno').text(orderno);
+        modalObj.find('#sehmnm').text(sehmno);
+        modalObj.find('#hmnm').text(hmnm);
+        modalObj.find('#makeripnm').text(maker);
+        modalObj.find('#orderqty').text(orderqty);
+        modalObj.find('#unitnm').text(unit);
+        modalObj.find('#delinm').text(delinm);
+        modalObj.find('#orderdt').text(orderdt);
+        modalObj.find('#orderPerson').text(orderperson);
+        modalObj.find('#agreed').text(agreed);
+        modalObj.find('#reqdelidt').text(reqdelidt);
+        modalObj.find('#remark').val(remark);
+        $('#REMARKERR').find('span').text("");
+
+        var elmnt = document.getElementById("dataDiv");
+        var scrollHor = elmnt.scrollLeft;
+        var scrollVer = elmnt.scrollTop;
+        modalObj.find('#scrollTop').val(document.documentElement.scrollTop);
+        modalObj.find('#scrollGridVer').val(scrollVer);
+        modalObj.find('#scrollGridHor').val(scrollHor);
+        modalObj.find('#D3010Updtdt').val(updtdt);
+
+        var url = '@Url.Action("getScheduleRegData")';
+        $("#scheTable tbody tr").remove();
+        $.ajax({
+            url: url,
+            type: 'POST',
+            async: false,
+            data: { orderno: orderno  }
+        }).done(function (data) {
+            var dataExist = false;
+
+            for (var index in data) {
+                dataExist = true;
+                var milisegundos = parseInt(data[index].DELISCHEDT.replace("/Date(", "").replace(")/", ""));
+                var ConvDate = new Date(milisegundos);
+                var DELISCHEDT = getForamttedDate(ConvDate);
+
+                var replydt = "";
+                if (data[index].REPLYDT != null) {
+                    var milisegundos = parseInt(data[index].REPLYDT.replace("/Date(", "").replace(")/", ""));
+                    var ConvDate = new Date(milisegundos);
+                    replydt = getForamttedDate(ConvDate);
+                } else {
+                    var currDate = new Date();
+                    replydt = getForamttedDate(currDate);
+                } 
+
+                var updtLong = parseInt(data[index].UPDTDT.replace("/Date(", "").replace(")/", ""));
+
+                $('#scheTable tbody').append("<tr>" +
+                   "<td class='colbtn' > <input id='btn_scheDataDelete' type='button' value='行削除' class='btn btn-danger btn-xs colbtn' /> </td>" +
+                    "<td class='DELISCHECNT'></td>" +
+                    "<td class='DELISCHEDT'><input type='text' class='form-control datepicker1 imedisabled' id='DC0060[" + index + "].DELISCHEDT' name='DC0060[" + index + "].DELISCHEDT' value=" + DELISCHEDT + " maxlength='10' placeholder='YYYY/MM/DD' style='width:100%;padding:4px;text-align:center;'> " +
+                    "<div style='text-align:left;'><span data-valmsg-for='DELISCHEDT' style='color:red;'></span></div >" + "</td > " + 
+                    "<td class='DELISCHEQTY'><input type='text' class='form-control' id='DC0060[" + index + "].DELISCHEQTY' name='DC0060[" + index + "].DELISCHEQTY' value=" + data[index].DELISCHEQTY + " style='text-align:right;'>" +
+                    "<input type='hidden'  id='DC0060[" + index + "].DELISCHECNT' name='DC0060[" + index + "].DELISCHECNT' value=" + data[index].DELISCHECNT +">" +
+                    "<input type='hidden' id='DC0060[" + index + "].ORDERNO'  name='DC0060[" + index + "].ORDERNO' value=" + data[index].ORDERNO + ">" +
+                    "<input type='hidden' id='DC0060[" + index + "].RECEIVEKBN' name='DC0060[" + index + "].RECEIVEKBN' value=" + data[index].RECEIVEKBN + ">" +
+                    //"<input type='hidden' id='DC0060[" + index + "].UKECHARGECD'  name='DC0060[" + index + "].UKECHARGECD' value=" + data[index].UKECHARGECD + "> " +
+                    "<input type='hidden' id='DC0060[" + index + "].REPLYDT' name='DC0060[" + index + "].REPLYDT' value=" + replydt + "> " +
+                    "<input type='hidden' id='DC0060[" + index + "].UPDTLNG' name='DC0060[" + index + "].UPDTLNG' value=" + updtLong + ">" + 
+                    "<div style='text-align:left;'><span data-valmsg-for='DELISCHEQTY' style='color:red;'></span></div>" + "</td > " +
+                    "</td > " +
+                    "</tr > ");
+
+                //Disable row based on receivekbn value
+                var i = 0;
+                var trs = $("#scheTable").find("tr");
+                $("#scheTable").find("tr").find("input[id$='RECEIVEKBN']").each(function () {
+                    var receiveKbn = $(this).val();
+                    if (receiveKbn != "1") {
+                        var delschedt = $(trs).find("input[id$='DELISCHEDT']")[i];
+                        var delscheqty = $(trs).find("input[id$='DELISCHEQTY']")[i];
+                        var deleteBtn = $(trs).find("input[id='btn_scheDataDelete']")[i];
+                        $(delschedt).prop('readonly', true);
+                        $(delschedt).removeClass("datepicker1");
+                        $(delscheqty).prop('readonly', true);
+                        $(deleteBtn).prop('disabled', true);
+                    }
+                    i = i + 1;
+                });
+            };
+
+            if (dataExist == false) {
+
+                var currDate = new Date();
+                var replydt = getForamttedDate(currDate);
+
+                $('#scheTable tbody').append("<tr>" +
+                    "<td class='colbtn' > <input id='btn_scheDataDelete' type='button' value='行削除' class='btn btn-danger btn-xs colbtn' /> </td>" +
+                    "<td class='DELISCHECNT'></td>" +
+                    "<td class='DELISCHEDT'><input type='text' class='form-control datepicker1 imedisabled' id='DC0060[0].DELISCHEDT' name='DC0060[0].DELISCHEDT' value='' maxlength='10' placeholder='YYYY/MM/DD' style='width:100%;padding:4px;text-align:center;'>"+
+                    "<div style='text-align:left;'><span data-valmsg-for='DELISCHEDT' style='color:red;'></span></div >" + "</td > " +
+                    "<td class='DELISCHEQTY'><input type='text' class='form-control' id='DC0060[0].DELISCHEQTY' name='DC0060[0].DELISCHEQTY' value='' style='text-align:right;'>" +
+                    "<input type='hidden'  id='DC0060[0].DELISCHECNT' name='DC0060[0].DELISCHECNT' value='1'>" +
+                    "<input type='hidden' id='DC0060[0].ORDERNO'  name='DC0060[0].ORDERNO' value=" + orderno + ">" +
+                    "<input type='hidden' id='DC0060[0].RECEIVEKBN' name='DC0060[0].RECEIVEKBN' value='1'>" +
+                    //"<input type='hidden' id='DC0060[0].UKECHARGECD'  name='DC0060[0].UKECHARGECD' value='N002'> " +
+                    "<input type='hidden' id='DC0060[0].REPLYDT' name='DC0060[0].REPLYDT' value=" + replydt + "> " +
+                    "<div style='text-align:left;'><span data-valmsg-for='DELISCHEQTY' style='color:red;'></span></div>" + "</td > " +
+                    "</td>" +
+                    "</tr > ");
+            }
+
+            $("#scheTable").find("tr").find("input[id$='DELISCHEQTY']").keypress(function (el) {
+                if (handleKeyPress(el) == true) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            $("#scheTable").find("tr").find("input[id$='DELISCHEQTY']").keyup(function (el) {
+                handleKeyUp(el);
+            });
+        }).fail(function () {
+            alert("データの読み込み中にエラーが発生しました。");
+        });        
+    });
+
+    $("#tblSearchResult tr").click(function () {
+         selectedRow = this;
+    });
+
+    $('body').on('focus', ".datepicker1", function () {
+        $(this).datepicker({
+            language: 'ja',
+            format: 'yyyy/mm/dd',
+            autoclose: true,
+            todayHighlight: true,
+            weekStart: 1,
+            inline: true,
+            sideBySide: true,
+            beforeShowDay: function (date) {
+                month = date.getMonth() + 1;
+                calender_date = date.getFullYear() + '-' + (month < 10 ? '0' + month : '' + month) + '-' + ('0' + date.getDate()).slice(-2);
+                var search_index = $.inArray(calender_date, array);
+
+                if (search_index > -1) {
+                    return { classes: 'highlighted-cal-dates' };
+                }
+            }
+        });
+    });
+
+    function getForamttedDate(ConvDate) {
+        var fmtDate = ConvDate.getFullYear() + "/" + (ConvDate.getMonth() + 1 < 9 ? '0' : '') + (ConvDate.getMonth() + 1) + "/" + (ConvDate.getDate() < 9 ? '0' : '') + (ConvDate.getDate());
+        return fmtDate;
+    }
+
+    function filterM0010() {
+        var inputhmno, inputhmnm, inputmakeripnm, table, tr, td, i, txtValue;
+        var inputhmnoVal, inputhmnmVal, inputmakeripnmVal;
+
+        inputhmno = document.getElementById("FILTHMNO");
+        inputhmnm = document.getElementById("FILTHMNM");
+        inputmakeripnm = document.getElementById("FILTMAKERIPNM");               
+
+        inputhmnoVal = inputhmno.value.toUpperCase();
+        inputhmnmVal = inputhmnm.value.toUpperCase();
+        inputmakeripnmVal = inputmakeripnm.value.toUpperCase();
+
+        table = document.getElementById("tblM0010");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+            tr[i].style.display = "";            
+        }
+
+        if (inputhmnoVal != "" || inputhmnmVal != "" || inputmakeripnmVal != "") {
+
+            for (i = 0; i < tr.length; i++) {
+
+                if (inputhmnoVal != "") {
+                    td = tr[i].getElementsByTagName("td")[0];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf(inputhmnoVal.trim()) > -1 && tr[i].style.display != "none") {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+
+                if (inputhmnmVal != "") {
+                    td = tr[i].getElementsByTagName("td")[1];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf(inputhmnmVal.trim()) > -1 && tr[i].style.display != "none") {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+
+                if (inputmakeripnmVal != "") {
+                    td = tr[i].getElementsByTagName("td")[2];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf(inputmakeripnmVal.trim()) > -1 && tr[i].style.display != "none") {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+            }
+        }        
+    }
+
+    $('#M0010Dialog').on('shown.bs.modal', function (e) {
+        var modalObj = $(this);
+        modalObj.find('#FILTHMNO').val('');
+        modalObj.find('#FILTHMNM').val('');
+        modalObj.find('#FILTMAKERIPNM').val('');
+        modalObj.find('#btnFilter').trigger('click')
+    });
+
+    function filterM1010() {
+        var inputBCCD, inputBCNM,  table, tr, td, i, txtValue;
+        var inputbccdVal, inputbcnmVal;
+
+        inputBCCD = document.getElementById("FILTBCCD");
+        inputBCNM = document.getElementById("FILTBCNM");
+
+        inputbccdVal = inputBCCD.value.toUpperCase();
+        inputbcnmVal = inputBCNM.value.toUpperCase();
+
+        table = document.getElementById("tblM1010Result");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+            tr[i].style.display = "";
+        }
+
+        if (inputbccdVal != "" || inputbcnmVal != "") {
+            for (i = 0; i < tr.length; i++) {
+                if (inputbccdVal != "") {
+                    td = tr[i].getElementsByTagName("td")[0];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf(inputbccdVal.trim()) > -1 && tr[i].style.display != "none") {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+
+                if (inputbcnmVal != "") {
+                    td = tr[i].getElementsByTagName("td")[1];
+                    if (td) {
+                        txtValue = td.textContent || td.innerText;
+                        if (txtValue.toUpperCase().indexOf(inputbcnmVal.trim()) > -1 && tr[i].style.display != "none") {
+                            tr[i].style.display = "";
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+            }
+        }
+        
+    }
+
+    $('#M1010Dialog').on('shown.bs.modal', function (e) {
+        var modalObj = $(this);
+        modalObj.find('#FILTBCCD').val('');
+        modalObj.find('#FILTBCNM').val('');
+        modalObj.find('#btnFilterM1010').trigger('click')
+    });
+
+    function checkDateRange(dateField) {
+
+        var from;
+        var to;
+        var errDiv;
+        var errMsg;
+
+        if (dateField == "orderdt") {
+            from = $("#ORDERDTFR").val();
+            to = $("#ORDERDTTO").val();
+            errDiv = $("#ErrorOrderDt");
+            errMsg = "注文日-開始と終了の前後関係が誤っています。";
+        }
+        else if (dateField == "agreed") {
+            from = $("#AGREEDFR").val();
+            to = $("#AGREEDTO").val();
+            errDiv = $("#ErrorAgreed");
+            errMsg = "注文納期-開始と終了の前後関係が誤っています。";
+        }
+        else if (dateField == "reqdeldt") {
+            from = $("#REQDELIDTFR").val();
+            to = $("#REQDELIDTTO").val();
+            errDiv = $("#Errorreqdel");
+            errMsg = "希望納期-開始と終了の前後関係が誤っています。";
+        }
+
+        if (Date.parse(from) > Date.parse(to)) {
+            errDiv.text(errMsg);
+            return false;
+        } else {
+            errDiv.text('');
+        }
+        
+        return true;
+    }
+
+    function getByteCount(str) {
+        var b = str.match(/[^\x00-\xff]/g);
+        return (str.length + (!b ? 0 : b.length));
+    }
+
+    function validateD3010Data() {
+        var trs = $("#tblSearchResult > tbody > tr");
+        var isErr = false;
+
+        trs.each(function () {
+            var BCCMT = $(this).find('input[id$=BCCMT]')[0].value;
+
+            if (getByteCount(BCCMT) > 40) {
+                $(this).find('span[data-valmsg-for$=BCCMT]').text("文字数がオーバーしています。");
+                isErr = true;
+            } else {
+                $(this).find('span[data-valmsg-for$=BCCMT]').text("");
+            }
+
+        });
+        return isErr;
+    }
+
+    function sortTable(n, datatype) {
+        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        var data_x, data_y,headerTable;
+        table = document.getElementById("tblSearchResult");
+        headerTable = document.getElementById("tbl-header");
+        switching = true;
+        // Set the sorting direction to ascending:
+        dir = "asc";
+        /* Make a loop that will continue until
+        no switching has been done: */
+        while (switching) {
+            // Start by saying: no switching is done:
+            switching = false;
+            rows = $("#tblSearchResult > tbody > tr");
+            /* Loop through all table rows (except the
+            first, which contains table headers): */
+            for (i = 0; i < (rows.length - 1); i++) {
+                // Start by saying there should be no switching:
+                shouldSwitch = false;
+                /* Get the two elements you want to compare,
+                one from current row and one from the next: */
+                x = rows[i].getElementsByTagName("TD")[n];
+                y = rows[i + 1].getElementsByTagName("TD")[n];
+                /* Check if the two rows should switch place,
+                based on the direction, asc or desc: */
+                if (dir == "asc") {
+
+                    if (datatype == "number") {
+                        data_x = (parseInt(x.innerHTML) == '' ? 0 : parseInt(x.innerHTML.replace(",", "")));
+                        data_y = (parseInt(y.innerHTML) == '' ? 0 : parseInt(y.innerHTML.replace(",", "")));
+                        if (data_x > data_y) {
+                            // If so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (datatype == "decimal") {
+                        data_x = (parseFloat(x.innerHTML) == '' ? 0 : parseFloat(x.innerHTML.replace(",","")));
+                        data_y = (parseFloat(y.innerHTML) == '' ? 0 : parseFloat(y.innerHTML.replace(",", "")));
+                        if (data_x > data_y) {
+                            // If so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }else {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            // If so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }  
+                } else if (dir == "desc") {
+                    if (datatype == "number") {
+                        data_x = (parseInt(x.innerHTML) == '' ? 0 : parseInt(x.innerHTML.replace(",", "")));
+                        data_y = (parseInt(y.innerHTML) == '' ? 0 : parseInt(y.innerHTML.replace(",", "")));
+                        if (data_x < data_y) {
+                            // If so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (datatype == "decimal") {
+                        data_x = (parseFloat(x.innerHTML) == '' ? 0 : parseFloat(x.innerHTML.replace(",", "")));
+                        data_y = (parseFloat(y.innerHTML) == '' ? 0 : parseFloat(y.innerHTML.replace(",", "")));
+                        if (data_x < data_y) {
+                            // If so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            // If so, mark as a switch and break the loop:
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }                      
+                }
+            }
+            if (shouldSwitch) {
+                /* If a switch has been marked, make the switch
+                and mark that a switch has been done: */
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                // Each time a switch is done, increase this count by 1:
+                switchcount++;
+            } else {
+                /* If no switching has been done AND the direction is "asc",
+                set the direction to "desc" and run the while loop again. */
+                if (switchcount == 0 && dir == "asc") {
+                    dir = "desc";
+                    switching = true;
+                }
+            }
+        }
+
+        /* Srno col number as it is */
+        rows = $("#tblSearchResult > tbody > tr");
+        for (i = 0; i < (rows.length); i++) {
+            x = rows[i].getElementsByTagName("TD")[0];
+            x.innerHTML = i + 1;
+        }
+    }
+
+    function searchConditionChng(control, labelCntr) {  
+
+        if (control == "orderno") {            
+            if (labelCntr[0].innerHTML == "～") {
+                $('input[name="OrderSeachFlg"]').val(1);
+                $('#ORDERNOTO').hide();
+                $('#ORDERNOTO').val("");
+                labelCntr[0].innerHTML = "を含む";
+            }
+            else if (labelCntr[0].innerHTML == "を含む") {
+                $('input[name="OrderSeachFlg"]').val(0);
+                labelCntr[0].innerHTML = "～";
+                $('#ORDERNOTO').show();
+            }
+        }
+        else if (control == "sehmno") { 
+
+            if (labelCntr[0].innerHTML == "～") {
+                $('input[name="ShmnoSeachFlg"]').val(1);
+                $('#SEHMNOTO').hide();
+                $('#SEHMNOTO').val("");
+                $('#btnSehmnoTO').hide();
+                labelCntr[0].innerHTML = "で始まる";
+            }
+            else if (labelCntr[0].innerHTML == "で始まる") {
+                $('input[name="ShmnoSeachFlg"]').val(0);
+                labelCntr[0].innerHTML = "～";
+                $('#SEHMNOTO').show();
+                $('#btnSehmnoTO').show();
+            }            
+        }        
+    }
+</script>
